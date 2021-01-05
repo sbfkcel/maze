@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "osx-temperature-sensor": "^1.0.7",
+    "systeminformation": "^4.30.1"
+  }
+}
