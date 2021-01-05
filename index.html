@@ -15,8 +15,8 @@
     <script>
         const app = document.getElementById("app"),
             btn = document.getElementById("refresh"),
-            w = 40,                             // 迷宫宽（不含墙体）
-            h = 40,                             // 迷宫高（不含墙体）
+            w = 20,                             // 迷宫宽（不含墙体）
+            h = 20,                             // 迷宫高（不含墙体）
             gap = 2,                            // 格子间隔
             col = w * 2 + 1,                    // 列数
             row = h * 2 + 1,                    // 行数
@@ -73,7 +73,7 @@
                 document.title = stepCount;
 
                 let step = taskData.splice(0,1)[0],
-                    speed = stepCount > col * row ? 200 : 0,
+                    speed = stepCount > col * row ? 100 : 0,
                     time = speed / 2;
 
                 // 绘制格子提示色
