@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>迷宫</title>
+    <style>
+        canvas {border:1px gray solid; background:darkgray;}
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <button id="refresh">Refresh</button>
+    <script src="./Maze.js"></script>
+    <script>
+        const app = document.getElementById("app"),
+            btn = document.getElementById("refresh"),
+            w = 40,                             // 迷宫宽（不含墙体）
+            h = 40,                             // 迷宫高（不含墙体）
+            gap = 2,                            // 格子间隔
+            col = w * 2 + 1,                    // 列数
+            row = h * 2 + 1,                    // 行数
+            girdSize = 12,                      // 格子大小
+            draw = (ctx,x,y,val,isPrep)=>{      // 格子绘制方法
+                ctx.fillStyle = isPrep ? 'magenta' : val === 0 ? 'black' : 'yellow';
+                x = x * girdSize + (x + 1) * gap;
+                y = y * girdSize + (y + 1) * gap;
+                
+                ctx.fillRect(x,y,girdSize,girdSize);
+            },
+            drawDelay = (ctx,x,y,val,isPrep,time)=>{
+                return new Promise((resolve,reject)=>{
+                    setTimeout(()=>{
+                        draw(ctx,x,y,val,isPrep);
+                        resolve();
+                    },time);
+                });
+            };
+        
+        let game,eachDraw,stepCount;
+        (game = ()=>{
+            const taskData = [],
+                maze = new Maze(w,h,{render:(index,pos,val)=>{
+                    taskData.push({
+                        index:index,
+                        x:pos[0],
+                        y:pos[1],
+                        val:val
+                    });
+                }}),
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d'),
+                width = col * girdSize + (col+1) * gap,
+                height = row * girdSize + (row+1) * gap;
+            
+            stepCount=0;
+            
+            canvas.width = width;
+            canvas.height = height;
+
+            canvas.style.width = `${width / 2}px`;
+            canvas.style.height = `${height / 2}px`;
+
+            app.innerHTML = "";
+            app.appendChild(canvas);
+
+            // 绘制
+            (eachDraw = async()=>{
+                if(!taskData.length){
+                    return;
+                };
+                stepCount++;
+                document.title = stepCount;
+
+                let step = taskData.splice(0,1)[0],
+                    speed = stepCount > col * row ? 200 : 0,
+                    time = speed / 2;
+
+                // 绘制格子提示色
+                draw(ctx,step.x,step.y,step.val,true);
+
+                // 绘制格子最终状态
+                await drawDelay(ctx,step.x,step.y,step.val,false,time);
+
+                // 绘制下一步
+                eachDraw();
+            })();
+            
+            // 控制台打印结果
+            maze.debug();
+        })();
+
+        btn.onclick = game;
+    </script>
+    
+</body>
+</html>
